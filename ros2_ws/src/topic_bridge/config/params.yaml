@@ -1,0 +1,6 @@
+/**:
+  ros__parameters:
+    interface: "mon0"
+    bssid: "12:00:00:00:00:22"
+    dst_mac: "ff:ff:ff:ff:ff:ff"
+    topic_suffix: "control_manager/mpc_tracker/predicted_trajectory"

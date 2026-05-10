@@ -19,7 +19,6 @@ include_directories(src/wifi_bridge)
 
 add_executable(wifi_node
         src/wifi_bridge/wifi_node.cpp
-        src/wifi_bridge/ignore.h
 )
 
 ament_target_dependencies(wifi_node mrs_msgs nav_msgs rclcpp geometry_msgs)
@@ -28,6 +27,11 @@ target_link_libraries(wifi_node tins)
 install(TARGETS
         wifi_node
         DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+        config
+        DESTINATION share/${PROJECT_NAME}
 )
 
 ament_package()

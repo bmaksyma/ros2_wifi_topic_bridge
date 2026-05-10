@@ -24,16 +24,24 @@ template <typename RosMsgT>
 class WifiBridgeNode : public rclcpp::Node {
 public:
     WifiBridgeNode() : Node("wifi_bridge") {
-        // iface_ = MonUtils::find_or_create_mon_iface();
-        iface_ = "mon0";
+        this->declare_parameter<string>("interface", "mon0");
+        this->declare_parameter<string>("bssid", "12:00:00:00:00:22");
+        this->declare_parameter<string>("dst_mac", "ff:ff:ff:ff:ff:ff");
+        this->declare_parameter<string>("topic_suffix", "control_manager/mpc_tracker/predicted_trajectory");
+
+        iface_ = this->get_parameter("interface").as_string();
+        string bssid_str = this->get_parameter("bssid").as_string();
+        string dst_str = this->get_parameter("dst_mac").as_string();
+        topic_suffix_ = this->get_parameter("topic_suffix").as_string();
+
         src_ = HWAddress<6>(NetworkInterface(iface_).hw_address());
-        bssid_ = HWAddress<6>("12:00:00:00:00:22");
-        dst_ = HWAddress<6>("ff:ff:ff:ff:ff:ff");
+        bssid_ = HWAddress<6>(bssid_str);
+        dst_ = HWAddress<6>(dst_str);
 
         string uav_name = get_drone_name();
         cout << "[code dbg] UAV name: " << uav_name << endl;
 
-        string my_topic = "/" + uav_name + "/control_manager/mpc_tracker/predicted_trajectory";
+        string my_topic = "/" + uav_name + "/" + topic_suffix_;
         sub_ = this->create_subscription<RosMsgT>(
             my_topic,
             rclcpp::SensorDataQoS(), // quos
@@ -123,7 +131,7 @@ private:
                 }
                 auto iter = traj_publishers_.find(sender_name);
                 if (iter == traj_publishers_.end()) {
-                    string topic_name = "/" + sender_name + "/control_manager/mpc_tracker/predicted_trajectory";
+                    string topic_name = "/" + sender_name + "/" + topic_suffix_;
                     auto pub = this->create_publisher<RosMsgT>(topic_name, rclcpp::SensorDataQoS());
                     traj_publishers_[sender_name] = pub;
                     RCLCPP_INFO(this->get_logger(), "Created new publisher for topic: %s", topic_name.c_str());
@@ -144,6 +152,7 @@ private:
     bool running_ = false;
 
     string iface_;
+    string topic_suffix_;
     HWAddress<6> src_;
     HWAddress<6> bssid_;
     HWAddress<6> dst_;

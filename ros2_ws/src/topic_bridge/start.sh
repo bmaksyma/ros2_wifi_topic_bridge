@@ -55,4 +55,4 @@ echo "[dbg] Running node."
 
 SETUP_CMD="export RMW_IMPLEMENTATION=rmw_zenoh_cpp && source /opt/ros/jazzy/setup.bash && source ${WS_DIR}/install/setup.bash"
 
-sudo bash -c "${SETUP_CMD} && ros2 run topic_bridge wifi_node"
+sudo bash -c "${SETUP_CMD} && ros2 run topic_bridge wifi_node --ros-args --params-file ${WS_DIR}/src/topic_bridge/config/params.yaml"
